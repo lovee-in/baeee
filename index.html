@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Birthday Journey For You ❤️</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    /* Reset & Base Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* Vibrant Warm Sunset Palette: Plum, Terracotta, Coral, Warm Amber, Champagne */
+      background: linear-gradient(135deg, #3B1B3B 0%, #7A284B 35%, #C84B31 70%, #D97724 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      color: #3B1B3B;
+      padding: 20px;
+    }
+
+    /* Floating Background Particle Hearts */
+    .bg-heart {
+      position: fixed;
+      bottom: -20px;
+      color: rgba(255, 179, 150, 0.6);
+      font-size: 22px;
+      animation: floatUp 7s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+      100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Main Container */
+    .container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Card Scaffolding */
+    .step-card {
+      background: #FFF8EE; /* Soft Champagne */
+      padding: 30px 24px;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      border: 2px solid #FFC29B; /* Peach Border Accent */
+      text-align: center;
+      display: none;
+      animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .step-card.active { display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Typography */
+    h1 { font-size: 26px; color: #7A284B; margin-bottom: 12px; }
+    h2 { font-size: 20px; color: #C84B31; margin-bottom: 10px; }
+    p { font-size: 15px; line-height: 1.5; color: #523048; margin-bottom: 20px; }
+
+    /* Interactive Buttons */
+    .btn {
+      background: linear-gradient(135deg, #C84B31, #D97724);
+      color: #FFF8EE;
+      border: none;
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(200, 75, 49, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      background: linear-gradient(135deg, #A83A22, #C6681A);
+    }
+
+    /* Step 1: Envelope Component */
+    .envelope-wrapper {
+      width: 200px;
+      height: 140px;
+      background: #FF9E79; /* Coral */
+      margin: 20px auto 30px;
+      position: relative;
+      border-radius: 0 0 12px 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      border-left: 100px solid transparent;
+      border-right: 100px solid transparent;
+      border-top: 80px solid #C84B31; /* Terracotta Flap */
+      transform-origin: top;
+      transition: transform 0.4s ease;
+    }
+
+    .envelope-seal {
+      position: absolute;
+      top: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: #FFD25A; /* Warm Amber */
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* Steps 2-5: Interactive 3D Polaroid Flip Card */
+    .polaroid-container {
+      perspective: 1000px;
+      width: 100%; height: 380px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .polaroid-card {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+
+    .polaroid-card.flipped { transform: rotateY(180deg); }
+
+    .polaroid-front, .polaroid-back {
+      position: absolute;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      background: #FFF;
+      padding: 12px 12px 40px 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      border: 1px solid #FFE4D6;
+    }
+
+    .polaroid-front img {
+      width: 100%; height: 300px;
+      object-fit: fill;
+      border-radius: 6px;
+    }
+
+    .polaroid-front .caption {
+      margin-top: 10px; font-weight: bold; color: #7A284B; font-size: 15px;
+    }
+
+    .polaroid-back {
+      transform: rotateY(180deg);
+      background: #FFF3E2;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 20px; text-align: center;
+    }
+
+    .polaroid-back p {
+      font-style: italic; color: #7A284B; font-size: 16px; margin: 0;
+    }
+
+    .flip-hint {
+      font-size: 12px; color: #D97724; font-weight: bold; margin-bottom: 12px;
+    }
+
+    /* Scratch-Off Canvas Wrapper */
+    .scratch-container {
+      position: relative;
+      width: 100%; height: 180px;
+      margin-bottom: 20px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px dashed #C84B31;
+    }
+
+    .scratch-secret {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #FFE4D6;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 15px; text-align: center;
+    }
+
+    .scratch-secret p { margin: 0; color: #7A284B; font-weight: bold; font-size: 16px; }
+
+    #scratch-canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      cursor: pointer; z-index: 2;
+    }
+
+    /* Final Letter Box & Typing Effect */
+    .letter-box {
+      background: #FFF3E2;
+      padding: 20px;
+      border-radius: 16px;
+      border-left: 4px solid #C84B31;
+      text-align: left;
+      min-height: 120px;
+      margin-bottom: 20px;
+    }
+
+    .letter-text {
+      font-size: 15px; line-height: 1.6; color: #3B1B3B; font-style: italic; white-space: pre-line;
+    }
+
+    /* Progress Bar Dots */
+    .progress-dots {
+      display: flex; justify-content: center; gap: 8px; margin-top: 20px;
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      background-color: #FFC29B;
+      border-radius: 50%; transition: all 0.3s;
+    }
+
+    .dot.active-dot { background-color: #C84B31; transform: scale(1.3); }
+
+    /* Audio Toggle Button (Hidden initially, shown after scratch card) */
+    .music-btn {
+      position: fixed; top: 20px; right: 20px;
+      background: #FFF8EE; border: 2px solid #FFC29B;
+      border-radius: 50%; width: 44px; height: 44px;
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 100; font-size: 18px;
+      animation: popIn 0.4s ease forwards;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Music Toggle -->
+  <audio id="bg-music" src="songggg.m4a" loop></audio>
+  <button class="music-btn" id="music-btn" onclick="toggleMusic()" title="Toggle Music">🎵</button>
+
+  <div class="container">
+
+    <!-- STEP 1: Unseal Envelope -->
+    <div class="step-card active" id="step-1">
+      <h1>>Hey MYY LOVEEE! ❤️</h1>
+      <p>I built this tiny space on the web just for you. Ready to go through a few special memories together?</p>
+      
+      <div class="envelope-wrapper" onclick="openEnvelope()">
+        <div class="envelope-flap" id="flap"></div>
+        <div class="envelope-seal">❤️</div>
+      </div>
+
+      <button class="btn" id="start-btn" style="display:none;" onclick="nextStep(2)">Step Inside ✨</button>
+      
+      <div class="progress-dots">
+        <span class="dot active-dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- STEP 2: Memory 1 (Polaroid Flip) -->
+    <div class="step-card" id="step-2">
+      <h2>✨ Unforgettable Memory</h2>
+      <span class="flip-hint">👆 Tap picture to flip & read back note!</span>
+      
+      <div class="polaroid-container" onclick="flipCard(this)">
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <img src="memory.jpeg" alt="Memory">
+            <div class="caption">One Of My Favorites 📸</div>
+          </div>
+          <div class="polaroid-back">
+            <p>"Yahiii vo din haiii joooo hamnee masttt milkee aada din guzaare thee.Aapki bagal me baithkee mujhee tohhh bohat achaa sa feel huaa."</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="nextStep(3)">See My Absolute Favorite 📸</button>
+
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot active-dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- STEP 3: Favorite Photo Slide -->
+    <div class="step-card" id="step-3">
+      <h2>Myyy Cutuuuuu si Jaaaanuuuuuu🧡</h2>
+      <span class="flip-hint">👆 Tap picture to flip & read back note!</span>
+
+      <div class="polaroid-container" onclick="flipCard(this)">
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <img src="fav.jpeg" alt="Favorite Photo">
+            <div class="caption">The Best Picture Ever ❤️</div>
+          </div>
+          <div class="polaroid-back">
+            <p>"Ismeee tohhh tum lajawab lagtee hoo jaaanu. Mera all time favourite photo haiii yeeee. Aapki cutuu sa cheraaa joo dekhtee hi phigal jaata huu."</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="nextStep(4)">Time for Your FAV 😛</button>
+
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot active-dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- STEP 4: Funny Photo Slide -->
+    <div class="step-card" id="step-4">
+      <h2>🤪 Asal Masttt haiii yeeee🤣😂</h2>
+      <span class="flip-hint">👆 Tap picture to flip & read back note!</span>
+
+      <div class="polaroid-container" onclick="flipCard(this)">
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <img src="funny.jpeg" alt="Funny Photo">
+            <div class="caption">Unfiltered & Iconic 😂</div>
+          </div>
+          <div class="polaroid-back">
+            <p>Gussaa matt huooooo yawrooooooooo. Piti Piti Mattt karooooooo😥.Bhejooo aur videoss isekeeeee Jaaanuuuuuu.🤗🤗</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="nextStep(5)">That Smile! 😊</button>
+
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot active-dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- STEP 5: Memory 2 (Polaroid Flip) -->
+    <div class="step-card" id="step-5">
+      <h2>😊 That Favourite Smile</h2>
+      <span class="flip-hint">👆 Tap picture to flip & read back note!</span>
+
+      <div class="polaroid-container" onclick="flipCard(this)">
+        <div class="polaroid-card">
+          <div class="polaroid-front">
+            <img src="smile.jpeg" alt="Smile">
+            <div class="caption">Thoseeee temptinggg Lipsssss😚😚</div>
+          </div>
+          <div class="polaroid-back">
+            <p>"Ye jo tumhariii smilee haiii na bebuuuu basss dekhtee hi rehjaaun aapki hoton ko aur sochtaa jaaun ki kabb milegii meriii jaanu mersii aur kahegiii ki "aagayi huuu khaloo abb mujheee" Voooo lipss kabb tastee karneee dee rahee ho mujhee😥😥😥</p>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="nextStep(6)">Uncover Secret 🎁</button>
+
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot active-dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- STEP 6: Scratch-to-Reveal Card -->
+    <div class="step-card" id="step-6">
+      <h2>🎨 Scratch to Reveal!</h2>
+      <p>Use your finger or mouse to scratch off the golden layer below!</p>
+
+      <div class="scratch-container">
+        <div class="scratch-secret">
+          <p>🎁 Surprise!</p>
+          <p style="font-weight:normal; font-size:14px; margin-top:5px;">Right corner me jo music symbol dikhraha haii vuseee click karnaaaa😁😁</p>
+        </div>
+        <canvas id="scratch-canvas"></canvas>
+      </div>
+
+      <button class="btn" onclick="nextStep(7)">Read Birthday Note 💌</button>
+
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot active-dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- STEP 7: Live Typing Letter & Confetti -->
+    <div class="step-card" id="step-7">
+      <h1>Happy Birthday! Meriiii Kuchuupuchuuuu🎉🎂</h1>
+      
+      <div class="letter-box">
+        <div class="letter-text" id="typed-text"></div>
+      </div>
+
+      <button class="btn" onclick="triggerConfetti()">Celebrate! 🎊</button>
+      <br><br>
+      <button class="btn" style="background: transparent; color: #C84B31; box-shadow: none; padding: 5px;" onclick="nextStep(1)">Replay Experience 🔁</button>
+
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot active-dot"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Navigation Step Router
+    function nextStep(stepNumber) {
+      document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
+      const target = document.getElementById('step-' + stepNumber);
+      if (target) target.classList.add('active');
+
+      // Unhide music button on/after step 6
+      if (stepNumber >= 6) {
+        document.getElementById('music-btn').style.display = 'flex';
+      } else {
+        document.getElementById('music-btn').style.display = 'none';
+      }
+
+      if (stepNumber === 6) initScratchCard();
+      if (stepNumber === 7) startTypingEffect();
+    }
+
+    // Step 1: Envelope Opening Logic
+    function openEnvelope() {
+      document.getElementById('flap').style.transform = 'rotateX(180deg)';
+      setTimeout(() => {
+        document.getElementById('start-btn').style.display = 'inline-block';
+      }, 400);
+    }
+
+    // Polaroid 3D Card Flip
+    function flipCard(container) {
+      const card = container.querySelector('.polaroid-card');
+      card.classList.toggle('flipped');
+    }
+
+    // Floating Particles Background
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('bg-heart');
+      heart.innerText = ['💖', '✨', '🌸', '✨'][Math.floor(Math.random() * 4)];
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+      heart.style.fontSize = (Math.random() * 12 + 14) + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 7000);
+    }
+    setInterval(createHeart, 350);
+
+    // Step 6: Scratch-Off Card Logic
+    function initScratchCard() {
+      const canvas = document.getElementById('scratch-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+
+      ctx.fillStyle = '#D97724'; // Warm Amber Metallic Overlay
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#FFF8EE';
+      ctx.font = 'bold 16px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillText('✨ Scratch Here ✨', canvas.width / 2, canvas.height / 2 + 5);
+
+      let isDrawing = false;
+
+      function scratch(e) {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      canvas.addEventListener('mousedown', () => isDrawing = true);
+      canvas.addEventListener('mouseup', () => isDrawing = false);
+      canvas.addEventListener('mousemove', scratch);
+      canvas.addEventListener('touchstart', () => isDrawing = true);
+      canvas.addEventListener('touchend', () => isDrawing = false);
+      canvas.addEventListener('touchmove', scratch);
+    }
+
+    // Step 7: Typing Effect Logic
+    const fullText =  "To My One and only JAANUUUUUU😘💕." + "\n" + " Meri cutuuuuuu si bebuuuu maii chahtaaa hu aap ko ye pasand aajayee. Merse kabbb milneee aaogee😥. Aapkii bhot yaad aarahi haiii jaaanuuuuu. I Love Youuu meriiiiiii cutuuuu sa bachaaaaa😘.Abb ku tohhh aapka birthday gift yahiii haiiii.Pasand aaya tohhh badaaaa sa kisssi denaaa mujheeeee😁😁.Btw gaana kaisaa lagyaa aapkuu?😅";
+    let typeIndex = 0;
+
+    function startTypingEffect() {
+      const target = document.getElementById('typed-text');
+      target.innerHTML = '';
+      typeIndex = 0;
+
+      function typeChar() {
+        if (typeIndex < fullText.length) {
+          target.innerHTML += fullText.charAt(typeIndex);
+          typeIndex++;
+          setTimeout(typeChar, 35);
+        } else {
+          triggerConfetti();
+        }
+      }
+      typeChar();
+    }
+
+    // Confetti Explosion Cannon
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#7A284B', '#C84B31', '#D97724', '#FFD25A']
+        });
+      }
+    }
+
+    // Background Audio Toggle
+    function toggleMusic() {
+      const music = document.getElementById('bg-music');
+      music.paused ? music.play() : music.pause();
+    }
+  </script>
+</body>
+</html>
